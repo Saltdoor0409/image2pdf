@@ -66,6 +66,7 @@ Run the program:
 python main.py
 ```
 
+> Replace `main.py` with your actual file name.
 
 Steps:
 
@@ -173,6 +174,50 @@ Users can then download the exe directly without cloning the repository.
 - **"No module named ..." error**: add the missing module with `--hidden-import <module_name>` and rebuild.
 - **Build fails with tkinter errors**: reinstall Python from python.org and make sure the "tcl/tk and IDLE" option is selected.
 
+### Reduce the EXE Size (Optional)
+
+PyInstaller bundles the Python runtime and every installed library it detects, so the exe can end up larger than necessary. These tips help shrink it.
+
+**1. Build in a clean virtual environment (most effective)**
+
+Packages you don't use (numpy, pandas, etc.) can get pulled in if they are installed globally. A fresh environment with only the required libraries avoids this:
+
+```cmd
+python -m venv venv
+venv\Scripts\activate
+pip install Pillow img2pdf pyinstaller
+pyinstaller --onefile --windowed --name ImageToPDF main.py
+```
+
+**2. Exclude modules you don't use**
+
+```cmd
+pyinstaller --onefile --windowed --name ImageToPDF ^
+  --exclude-module numpy ^
+  --exclude-module pandas ^
+  --exclude-module matplotlib ^
+  --exclude-module scipy ^
+  main.py
+```
+
+> In PowerShell, use a backtick `` ` `` instead of `^` for line breaks.
+
+**3. Compress with UPX (optional)**
+
+Download [UPX](https://github.com/upx/upx/releases), extract it, then point PyInstaller to it:
+
+```cmd
+pyinstaller --onefile --windowed --upx-dir "C:\path\to\upx" --name ImageToPDF main.py
+```
+
+This typically saves another 20–30%, but UPX-compressed executables are more likely to trigger antivirus false positives.
+
+**Tips**
+
+- Delete the old `build/`, `dist/` and `.spec` files before rebuilding to avoid stale cache.
+- Since the app uses Tkinter and Pillow, a size of around 10 MB is close to the practical minimum.
+- Skipping `img2pdf` saves a little space but removes the lossless mode, so it is not recommended.
+
 ---
 
 ## ❓ FAQ
@@ -185,18 +230,6 @@ A: Only the first frame is used.
 
 **Q: I get an error during conversion.**
 A: Make sure the image isn't corrupted and that you have write permission for the save location. The error message is shown in a popup.
-
----
-
-## 🤝 Contributing
-
-Issues and pull requests are welcome!
-
-1. Fork this repository
-2. Create a branch: `git checkout -b feature/your-feature`
-3. Commit your changes: `git commit -m "Add some feature"`
-4. Push the branch: `git push origin feature/your-feature`
-5. Open a Pull Request
 
 ---
 
