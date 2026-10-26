@@ -66,7 +66,6 @@ Run the program:
 python main.py
 ```
 
-> Replace `main.py` with your actual file name.
 
 Steps:
 
